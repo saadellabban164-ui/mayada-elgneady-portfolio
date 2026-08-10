@@ -460,7 +460,7 @@
         };
         window.closeOrderModal = () => document.getElementById('order-modal').classList.add('hidden');
 
-        document.getElementById('client-order-form').addEventListener('submit', (e) => {
+       document.getElementById('client-order-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('order-submit-btn');
             btn.disabled = true; btn.innerText = "جاري الإرسال...";
@@ -475,9 +475,15 @@
                         status: 'pending', createdAt: new Date().toISOString()
                     };
                     
-                    if (window.submitOrderToFirebase) {
-                        window.submitOrderToFirebase(newRequest);
-                    }
+if (window.submitOrderToFirebase) {
+    window.submitOrderToFirebase(newRequest)
+        .then((firebaseRequestId) => {
+            newRequest.firebaseId = firebaseRequestId;
+        })
+        .catch((error) => {
+            console.error("Firebase order error:", error);
+        });
+}
                     
                     let savedRequests = JSON.parse(localStorage.getItem('mayada_requests')) || [];
                     savedRequests.push(newRequest);
@@ -532,11 +538,18 @@
                 const tabsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'tabs');
                 const socialDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'social');
 
-                window.submitOrderToFirebase = async (newRequest) => {
-                    try {
-                        await addDoc(requestsCollection, newRequest);
-                    } catch(e) { console.error(e); }
-                };
+               window.submitOrderToFirebase = async (newRequest) => {
+    try {
+        const docRef = await addDoc(requestsCollection, newRequest);
+
+        console.log("Request created:", docRef.id);
+
+        return docRef.id;
+    } catch (e) {
+        console.error("Firebase request error:", e);
+        throw e;
+    }
+};
 
                 onSnapshot(projectsCollection, (snapshot) => {
                     const fetchedProjects = [];
