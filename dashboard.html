@@ -821,7 +821,12 @@ window.saveMenuTabs = async () => {
     <!-- Firebase Integration - Dashboard -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
    import {
     getFirestore,
     doc,
@@ -844,16 +849,7 @@ window.saveMenuTabs = async () => {
             const db = getFirestore(app);
 
            async function initFirebase() {
-    try {
-        if (typeof __initial_auth_token !== 'undefined') {
-            await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-            await signInAnonymously(auth);
-        }
-    } catch (e) {
-        console.error("Auth error:", e);
-        return;
-    }
+
 
     if (!auth.currentUser) return;
 
@@ -1018,34 +1014,6 @@ function loadOrderChat(requestId) {
                 messagesList.appendChild(messageDiv);
             });
 
-            snapshot.forEach((messageDoc) => {
-
-                const message = messageDoc.data();
-                const isAdmin = message.sender === 'admin';
-
-                const messageDiv = document.createElement('div');
-
-                messageDiv.className =
-                    `flex ${isAdmin ? 'justify-start' : 'justify-end'} mb-3`;
-
-                messageDiv.innerHTML = `
-                    <div class="max-w-[80%]">
-                        <div class="px-4 py-3 rounded-2xl ${
-                            isAdmin
-                                ? 'bg-blue-600 text-white rounded-br-md'
-                                : 'bg-slate-100 text-slate-800 rounded-bl-md'
-                        }">
-                            ${escapeChatHTML(message.text || '')}
-                        </div>
-                        <div class="text-[10px] text-slate-400 mt-1 px-1">
-                            ${isAdmin ? 'أنت' : 'العميل'}
-                        </div>
-                    </div>
-                `;
-
-                messagesList.appendChild(messageDiv);
-            });
-
             messagesList.scrollTop = messagesList.scrollHeight;
         },
         (error) => {
@@ -1058,20 +1026,6 @@ function loadOrderChat(requestId) {
             `;
         }
     );
-}
-
-
-            messagesList.scrollTop = messagesList.scrollHeight;
-        }
-        (error) => {
-            console.error("Chat listener error:", error);
-
-            messagesList.innerHTML = `
-                <div class="text-red-500 text-center py-8">
-                    حدث خطأ في تحميل المحادثة.
-                </div>
-            `;
-        };
 }
 
 window.sendDashboardChatMessage = async () => {
@@ -1396,7 +1350,11 @@ window.sendDashboardChatMessage = async () => {
                 }
             }
 
-            initFirebase();
-    </script>
+                   }
+
+    } // نهاية initFirebase
+
+    initFirebase();
+</script>
 </body>
 </html>
