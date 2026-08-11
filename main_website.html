@@ -458,8 +458,7 @@
             document.getElementById('order-modal').classList.remove('hidden'); 
         };
         window.closeOrderModal = () => document.getElementById('order-modal').classList.add('hidden');
-
-      ```javascript
+    
 document.getElementById('client-order-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -514,14 +513,10 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
     } catch (err) {
         console.error("Order error:", err);
         alert("حدث خطأ أثناء إرسال الطلب.");
-    } finally {
-        btn.disabled = false;
+    } finally { btn.disabled = false;
         btn.innerText = "إرسال";
     }
 });
-```
-
-
         window.addEventListener('storage', (event) => {
             if (['mayada_general_v3', 'mayada_projects', 'mayada_menu_tabs', 'mayada_social_v3', 'mayada_social_v2'].includes(event.key)) {
                 window.renderDynamicWebsite();
