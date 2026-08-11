@@ -97,7 +97,7 @@
 
             <div class="flex items-center gap-3">
                 <button onclick="openOrderModal()" class="hidden md:flex items-center gap-2 bg-[var(--primary-color)] text-white font-bold text-sm px-5 py-2.5 rounded-full shadow-lg hover:opacity-90 transition-transform active:scale-95">
-                    <i class="fa-solid fa-paper-plane"></i> <span>تواصل معي</span>
+                    <i class="fa-solid fa-paper-plane"></i> <span>اطلب تصميمك </span>
                 </button>
             </div>
         </div>
@@ -139,8 +139,8 @@
                 <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[var(--primary-color)] flex items-center justify-center text-2xl mx-auto">
                     <i class="fa-solid fa-paper-plane"></i>
                 </div>
-                <h3 class="text-2xl font-black text-slate-900">إرسال طلب / استفسار</h3>
-                <p class="text-xs text-slate-500 font-bold">اترك تفاصيلك وسأتواصل معك قريباً</p>
+                <h3 class="text-2xl font-black text-slate-900"> اطلب تصميمك </h3>
+                <p class="text-xs text-slate-500 font-bold">أرسل تفاصيل طلبك وسنتابع معك</p>
             </div>
 
             <div id="order-success-msg" class="hidden bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-center text-sm font-bold">
@@ -271,8 +271,7 @@
                                 <p class="text-slate-600 text-lg leading-relaxed max-w-xl font-medium">${formatText(generalData.heroDesc)}</p>
                                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-4">
                                     ${portfolioProjects.length > 0 ? `<a href="#work" class="bg-[var(--primary-color)] text-white px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-blue-500/20 hover:opacity-90 transition-all active:scale-95">تصفح الأعمال <i class="fa-solid fa-arrow-left mr-2"></i></a>` : ''}
-                                    <button onclick="openOrderModal()" class="bg-white border-2 border-slate-200 text-slate-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">تواصل معي</button>
-                                </div>
+                                    <button onclick="openOrderModal()" class="bg-white border-2 border-slate-200 text-slate-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">اطلب تصميمك</button>
                             </div>
                             <div class="flex-1 w-full max-w-md relative">
                                 <div class="aspect-square rounded-3xl overflow-hidden shadow-2xl glass-card p-3 relative group">
@@ -460,41 +459,68 @@
         };
         window.closeOrderModal = () => document.getElementById('order-modal').classList.add('hidden');
 
-       document.getElementById('client-order-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('order-submit-btn');
-            btn.disabled = true; btn.innerText = "جاري الإرسال...";
-            setTimeout(() => {
-                try {
-                    const newRequest = {
-                        id: Date.now().toString(),
-                        clientName: document.getElementById('orderClientName').value,
-                        clientEmail: document.getElementById('orderClientEmail').value,
-                        clientPhone: document.getElementById('orderClientPhone').value,
-                        requestDetails: document.getElementById('orderClientDetails').value,
-                        status: 'pending', createdAt: new Date().toISOString()
-                    };
-                    
-if (window.submitOrderToFirebase) {
-    window.submitOrderToFirebase(newRequest)
-        .then((firebaseRequestId) => {
-            newRequest.firebaseId = firebaseRequestId;
-        })
-        .catch((error) => {
-            console.error("Firebase order error:", error);
-        });
-}
-                    
-                    let savedRequests = JSON.parse(localStorage.getItem('mayada_requests')) || [];
-                    savedRequests.push(newRequest);
-                    localStorage.setItem('mayada_requests', JSON.stringify(savedRequests));
-                    document.getElementById('client-order-form').reset();
-                    document.getElementById('client-order-form').classList.add('hidden');
-                    document.getElementById('order-success-msg').classList.remove('hidden');
-                } catch (err) { alert("حدث خطأ."); } 
-                finally { btn.disabled = false; btn.innerText = "إرسال"; }
-            }, 800);
-        });
+      ```javascript
+document.getElementById('client-order-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById('order-submit-btn');
+    btn.disabled = true;
+    btn.innerText = "جاري الإرسال...";
+
+    try {
+        const newRequest = {
+            id: Date.now().toString(),
+
+            clientName: document.getElementById('orderClientName').value.trim(),
+            clientEmail: document.getElementById('orderClientEmail').value.trim(),
+            clientPhone: document.getElementById('orderClientPhone').value.trim(),
+            requestDetails: document.getElementById('orderClientDetails').value.trim(),
+
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+
+            clientNotified: false,
+            adminMessage: '',
+            appInstalled: false,
+            notificationEnabled: false
+        };
+
+        if (window.submitOrderToFirebase) {
+            try {
+                const firebaseRequestId =
+                    await window.submitOrderToFirebase(newRequest);
+
+                newRequest.firebaseId = firebaseRequestId;
+            } catch (error) {
+                console.error("Firebase order error:", error);
+            }
+        }
+
+        let savedRequests =
+            JSON.parse(localStorage.getItem('mayada_requests')) || [];
+
+        savedRequests.push(newRequest);
+
+        localStorage.setItem(
+            'mayada_requests',
+            JSON.stringify(savedRequests)
+        );
+
+        document.getElementById('client-order-form').reset();
+        document.getElementById('client-order-form').classList.add('hidden');
+        document.getElementById('order-success-msg').classList.remove('hidden');
+
+    } catch (err) {
+        console.error("Order error:", err);
+        alert("حدث خطأ أثناء إرسال الطلب.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "إرسال";
+    }
+});
+```
+
 
         window.addEventListener('storage', (event) => {
             if (['mayada_general_v3', 'mayada_projects', 'mayada_menu_tabs', 'mayada_social_v3', 'mayada_social_v2'].includes(event.key)) {
