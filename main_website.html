@@ -578,18 +578,24 @@ console.log(requestsCollection);
 
 window.submitOrderToFirebase = async (newRequest) => {
     console.log("🔥 FIREBASE FUNCTION CALLED");
+    console.log("🔥 BEFORE ADDDOC", newRequest);
 
     try {
-        console.log("🔥 BEFORE ADDDOC");
+        const docRef = await addDoc(
+            collection(db, "requests"),
+            {
+                ...newRequest,
+                createdAt: new Date()
+            }
+        );
 
-        const docRef = await addDoc(requestsCollection, newRequest);
-
-        console.log("🔥 AFTER ADDDOC", docRef.id);
+        console.log("🔥 AFTER ADDDOC:", docRef.id);
 
         return docRef.id;
-    } catch (e) {
-        console.error("🔥 FIRESTORE ERROR", e);
-        throw e;
+
+    } catch (error) {
+        console.error("🔥 FIRESTORE ERROR:", error);
+        throw error;
     }
 };
 
