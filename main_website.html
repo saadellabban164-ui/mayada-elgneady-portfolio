@@ -577,19 +577,18 @@ const socialDoc = doc(db, 'settings', 'social');
 console.log(requestsCollection);
 
 window.submitOrderToFirebase = async (newRequest) => {
-    console.log("1. Starting Firestore add...");
+    console.log("🔥 FIREBASE FUNCTION CALLED");
 
     try {
-        console.log("2. User:", auth.currentUser?.uid);
-        console.log("3. Collection:", requestsCollection.path);
+        console.log("🔥 BEFORE ADDDOC");
 
         const docRef = await addDoc(requestsCollection, newRequest);
 
-        console.log("4. Firestore SUCCESS:", docRef.id);
+        console.log("🔥 AFTER ADDDOC", docRef.id);
 
         return docRef.id;
     } catch (e) {
-        console.error("5. FIRESTORE ERROR:", e);
+        console.error("🔥 FIRESTORE ERROR", e);
         throw e;
     }
 };
