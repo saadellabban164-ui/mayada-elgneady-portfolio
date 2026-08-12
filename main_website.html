@@ -561,16 +561,23 @@ const tabsDoc = doc(db, 'settings', 'tabs');
 const socialDoc = doc(db, 'settings', 'social');
            console.log("Firebase Ready");
 console.log(requestsCollection);
-
+console.log("🔥 Firestore project:", firebaseConfig.projectId);
+console.log("🔥 Auth UID:", auth.currentUser?.uid);
+console.log("🔥 Requests path:", requestsCollection.path);
 window.submitOrderToFirebase = async (newRequest) => {
     console.log("🔥 FIREBASE FUNCTION CALLED");
-    console.log("🔥 BEFORE ADDDOC", newRequest);
+    console.log("🔥 BEFORE ADDDOC");
 
-    const docRef = await addDoc(requestsCollection, newRequest);
+    try {
+        const docRef = await addDoc(requestsCollection, newRequest);
 
-    console.log("🔥 AFTER ADDDOC", docRef.id);
+        console.log("🔥 AFTER ADDDOC:", docRef.id);
 
-    return docRef.id;
+        return docRef.id;
+    } catch (error) {
+        console.error("🔥 ADDDOC ERROR:", error);
+        throw error;
+    }
 };
                 onSnapshot(projectsCollection, (snapshot) => {
                     const fetchedProjects = [];
