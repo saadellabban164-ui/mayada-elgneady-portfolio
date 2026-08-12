@@ -521,8 +521,13 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         console.log("Firebase script started");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, onSnapshot, collection, doc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+      import {
+    initializeFirestore,
+    onSnapshot,
+    collection,
+    doc,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
        const firebaseConfig = {
     apiKey: "AIzaSyAVOhYUlPM8sYbHNA3jlp83ShGL0h1pen4",
     authDomain: "mayada-protofolio.firebaseapp.com",
@@ -539,8 +544,9 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
-            const db = getFirestore(app);
-
+         const db = initializeFirestore(app, {
+    experimentalForceLongPolling: true
+});
             async function initFirebase() {
                 try {
                     if (typeof __initial_auth_token !== 'undefined') {
