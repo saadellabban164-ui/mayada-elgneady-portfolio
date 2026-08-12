@@ -488,6 +488,8 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         if (window.submitOrderToFirebase) {
             try {
                 const firebaseRequestId =
+                console.log("Sending...");
+console.log(newRequest);
                     await window.submitOrderToFirebase(newRequest);
 
                 newRequest.firebaseId = firebaseRequestId;
@@ -559,7 +561,10 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
                 const tabsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'tabs');
                 const socialDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'social');
 
-               window.submitOrderToFirebase = async (newRequest) => {
+           console.log("Firebase Ready");
+console.log(requestsCollection);
+
+window.submitOrderToFirebase = async (newRequest) => {
     try {
         const docRef = await addDoc(requestsCollection, newRequest);
 
