@@ -571,17 +571,27 @@ console.log("🔥 Firestore project:", firebaseConfig.projectId);
 console.log("🔥 Auth UID:", auth.currentUser?.uid);
 console.log("🔥 Requests path:", requestsCollection.path);
 window.submitOrderToFirebase = async (newRequest) => {
-    console.log("🔥 FIREBASE FUNCTION CALLED");
-    console.log("🔥 BEFORE ADDDOC");
-
+    console.log("🔥 1 - FUNCTION");
+    
     try {
-        const docRef = await addDoc(requestsCollection, newRequest);
+        console.log("🔥 2 - ADDDOC START");
 
-        console.log("🔥 AFTER ADDDOC:", docRef.id);
+        const promise = addDoc(requestsCollection, newRequest);
+
+        console.log("🔥 3 - PROMISE CREATED", promise);
+
+        const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Firestore addDoc timed out after 10 seconds")), 10000)
+        );
+
+        const docRef = await Promise.race([promise, timeout]);
+
+        console.log("🔥 4 - SUCCESS", docRef.id);
 
         return docRef.id;
+
     } catch (error) {
-        console.error("🔥 ADDDOC ERROR:", error);
+        console.error("🔥🔥 FIRESTORE REAL ERROR:", error);
         throw error;
     }
 };
