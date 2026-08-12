@@ -521,13 +521,16 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         console.log("Firebase script started");
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-      import {
-    initializeFirestore,
+    import {
+    getFirestore,
     onSnapshot,
     collection,
     doc,
     addDoc
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
        const firebaseConfig = {
     apiKey: "AIzaSyAVOhYUlPM8sYbHNA3jlp83ShGL0h1pen4",
     authDomain: "mayada-protofolio.firebaseapp.com",
@@ -571,29 +574,13 @@ console.log("🔥 Firestore project:", firebaseConfig.projectId);
 console.log("🔥 Auth UID:", auth.currentUser?.uid);
 console.log("🔥 Requests path:", requestsCollection.path);
 window.submitOrderToFirebase = async (newRequest) => {
-    console.log("🔥 1 - FUNCTION");
-    
-    try {
-        console.log("🔥 2 - ADDDOC START");
+    console.log("🔥 ADDING REQUEST");
 
-        const promise = addDoc(requestsCollection, newRequest);
+    const docRef = await addDoc(requestsCollection, newRequest);
 
-        console.log("🔥 3 - PROMISE CREATED", promise);
+    console.log("🔥 REQUEST ADDED:", docRef.id);
 
-        const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Firestore addDoc timed out after 10 seconds")), 10000)
-        );
-
-        const docRef = await Promise.race([promise, timeout]);
-
-        console.log("🔥 4 - SUCCESS", docRef.id);
-
-        return docRef.id;
-
-    } catch (error) {
-        console.error("🔥🔥 FIRESTORE REAL ERROR:", error);
-        throw error;
-    }
+    return docRef.id;
 };
                 onSnapshot(projectsCollection, (snapshot) => {
                     const fetchedProjects = [];
