@@ -536,8 +536,16 @@ console.log(newRequest);
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, onSnapshot, collection, doc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+       const firebaseConfig = {
+    apiKey: "AIzaSyAVOhYUlPM8sYbHNA3jlp83ShGL0h1pen4",
+    authDomain: "mayada-protofolio.firebaseapp.com",
+    databaseURL: "https://mayada-protofolio-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mayada-protofolio",
+    storageBucket: "mayada-protofolio.firebasestorage.app",
+    messagingSenderId: "1056580053143",
+    appId: "1:1056580053143:web:583ea8fbc8954eaa8221d2",
+    measurementId: "G-83B0MEK7T7"
+};
 
         console.log("firebaseConfig:", firebaseConfig);
         
@@ -557,13 +565,12 @@ console.log(newRequest);
 
                 if (!auth.currentUser) return;
 
-                const projectsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-                const requestsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'requests');
-                
-                const generalDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'general');
-                const tabsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'tabs');
-                const socialDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'social');
+               const projectsCollection = collection(db, 'projects');
+const requestsCollection = collection(db, 'requests');
 
+const generalDoc = doc(db, 'settings', 'general');
+const tabsDoc = doc(db, 'settings', 'tabs');
+const socialDoc = doc(db, 'settings', 'social');
            console.log("Firebase Ready");
 console.log(requestsCollection);
 
