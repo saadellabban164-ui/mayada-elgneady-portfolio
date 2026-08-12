@@ -460,50 +460,35 @@
         window.closeOrderModal = () => document.getElementById('order-modal').classList.add('hidden');
     
 document.getElementById('client-order-form').addEventListener('submit', async (e) => {
-    console.log("SUBMIT HANDLER STARTED");
     e.preventDefault();
 
     const btn = document.getElementById('order-submit-btn');
     btn.disabled = true;
-    btn.innerText = "جاري الإرسال...";
+    btn.innerText = 'جاري الإرسال...';
+
+    const newRequest = {
+        id: Date.now().toString(),
+        clientName: document.getElementById('orderClientName').value.trim(),
+        clientEmail: document.getElementById('orderClientEmail').value.trim(),
+        clientPhone: document.getElementById('orderClientPhone').value.trim(),
+        requestDetails: document.getElementById('orderClientDetails').value.trim(),
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
 
     try {
-        const newRequest = {
-            id: Date.now().toString(),
-
-            clientName: document.getElementById('orderClientName').value.trim(),
-            clientEmail: document.getElementById('orderClientEmail').value.trim(),
-            clientPhone: document.getElementById('orderClientPhone').value.trim(),
-            requestDetails: document.getElementById('orderClientDetails').value.trim(),
-
-            status: 'pending',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-
-            clientNotified: false,
-            adminMessage: '',
-            appInstalled: false,
-            notificationEnabled: false
-        };
-
-        if (window.submitOrderToFirebase) {
-            try {
-                const firebaseRequestId =
-                console.log("Sending...");
-console.log(newRequest);
-                    await window.submitOrderToFirebase(newRequest);
-
-                newRequest.firebaseId = firebaseRequestId;
-            } catch (error) {
-                console.error("Firebase order error:", error);
-            }
+        if (!window.submitOrderToFirebase) {
+            throw new Error('Firebase submit function is not ready');
         }
 
+        const firebaseId = await window.submitOrderToFirebase(newRequest);
+        newRequest.firebaseId = firebaseId;
+
         let savedRequests =
-            JSON.parse(localStorage.getItem('mayada_requests')) || [];
+            JSON.parse(localStorage.getItem('mayada_requests') || '[]');
 
         savedRequests.push(newRequest);
-
         localStorage.setItem(
             'mayada_requests',
             JSON.stringify(savedRequests)
@@ -513,11 +498,12 @@ console.log(newRequest);
         document.getElementById('client-order-form').classList.add('hidden');
         document.getElementById('order-success-msg').classList.remove('hidden');
 
-    } catch (err) {
-        console.error("Order error:", err);
-        alert("حدث خطأ أثناء إرسال الطلب.");
-    } finally { btn.disabled = false;
-        btn.innerText = "إرسال";
+    } catch (error) {
+        console.error('Order submission failed:', error);
+        alert('حدث خطأ أثناء إرسال الطلب.');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'إرسال';
     }
 });
         window.addEventListener('storage', (event) => {
