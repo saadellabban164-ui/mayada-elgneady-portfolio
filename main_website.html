@@ -539,6 +539,8 @@ console.log(newRequest);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
 
+        console.log("firebaseConfig:", firebaseConfig);
+        
         if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
