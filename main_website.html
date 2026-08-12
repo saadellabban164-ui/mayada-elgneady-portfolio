@@ -561,6 +561,7 @@ console.log(newRequest);
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
+                        console.log("Firebase Auth Success:", auth.currentUser);
                     }
                 } catch (e) { console.error("Auth error:", e); return; }
 
