@@ -569,7 +569,7 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         if (!auth.currentUser) return;
 
         const projectsCollection = collection(db, 'projects');
-        const requestsCollection = collection(db, 'requests');
+      const requestsCollection = collection(db, "requests");
 
         const generalDoc = doc(db, 'settings', 'general');
         const tabsDoc = doc(db, 'settings', 'tabs');
@@ -578,18 +578,15 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         console.log("Firebase Ready");
         console.log("Requests:", requestsCollection);
 
-        window.submitOrderToFirebase = async (newRequest) => {
-            console.log("🔥 ADDING REQUEST");
+      window.submitOrderToFirebase = async (newRequest) => {
+    console.log("🔥 ADDING REQUEST", newRequest);
 
-            const docRef = await addDoc(
-                requestsCollection,
-                newRequest
-            );
+    const docRef = await addDoc(requestsCollection, newRequest);
 
-            console.log("🔥 REQUEST ADDED:", docRef.id);
+    console.log("🔥 REQUEST ADDED:", docRef.id);
 
-            return docRef.id;
-        };
+    return docRef.id;
+};
 
                 onSnapshot(projectsCollection, (snapshot) => {
                     const fetchedProjects = [];
