@@ -517,71 +517,80 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
     </script>
 
     <!-- Firebase Integration - Main Site -->
-    <script type="module">
-        console.log("Firebase script started");
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
-    getFirestore,
-    onSnapshot,
-    collection,
-    doc,
-    addDoc
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-       const firebaseConfig = {
-    apiKey: "AIzaSyAVOhYUlPM8sYbHNA3jlp83ShGL0h1pen4",
-    authDomain: "mayada-protofolio.firebaseapp.com",
-    databaseURL: "https://mayada-protofolio-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "mayada-protofolio",
-    storageBucket: "mayada-protofolio.firebasestorage.app",
-    messagingSenderId: "1056580053143",
-    appId: "1:1056580053143:web:583ea8fbc8954eaa8221d2",
-    measurementId: "G-83B0MEK7T7"
-};
+        getAuth,
+        signInAnonymously,
+        signInWithCustomToken
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+        getFirestore,
+        onSnapshot,
+        collection,
+        doc,
+        addDoc
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        console.log("firebaseConfig:", firebaseConfig);
-        
-        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-         const db = initializeFirestore(app, {
-    experimentalForceLongPolling: true
-});
-            async function initFirebase() {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined') {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Firebase Auth Success:", auth.currentUser);
-                    }
-                } catch (e) { console.error("Auth error:", e); return; }
+    console.log("Firebase script started");
 
-                if (!auth.currentUser) return;
+    const firebaseConfig = {
+        apiKey: "AIzaSyAVOhYUlPM8sYbHNA3jlp83ShGL0h1pen4",
+        authDomain: "mayada-protofolio.firebaseapp.com",
+        databaseURL: "https://mayada-protofolio-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "mayada-protofolio",
+        storageBucket: "mayada-protofolio.firebasestorage.app",
+        messagingSenderId: "1056580053143",
+        appId: "1:1056580053143:web:583ea8fbc8954eaa8221d2",
+        measurementId: "G-83B0MEK7T7"
+    };
 
-               const projectsCollection = collection(db, 'projects');
-const requestsCollection = collection(db, 'requests');
+    console.log("firebaseConfig:", firebaseConfig);
 
-const generalDoc = doc(db, 'settings', 'general');
-const tabsDoc = doc(db, 'settings', 'tabs');
-const socialDoc = doc(db, 'settings', 'social');
-           console.log("Firebase Ready");
-console.log(requestsCollection);
-console.log("🔥 Firestore project:", firebaseConfig.projectId);
-console.log("🔥 Auth UID:", auth.currentUser?.uid);
-console.log("🔥 Requests path:", requestsCollection.path);
-window.submitOrderToFirebase = async (newRequest) => {
-    console.log("🔥 ADDING REQUEST");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const docRef = await addDoc(requestsCollection, newRequest);
+    async function initFirebase() {
+        try {
+            if (typeof __initial_auth_token !== 'undefined') {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
 
-    console.log("🔥 REQUEST ADDED:", docRef.id);
+            console.log("Firebase Auth Success:", auth.currentUser);
 
-    return docRef.id;
-};
+        } catch (e) {
+            console.error("Auth error:", e);
+            return;
+        }
+
+        if (!auth.currentUser) return;
+
+        const projectsCollection = collection(db, 'projects');
+        const requestsCollection = collection(db, 'requests');
+
+        const generalDoc = doc(db, 'settings', 'general');
+        const tabsDoc = doc(db, 'settings', 'tabs');
+        const socialDoc = doc(db, 'settings', 'social');
+
+        console.log("Firebase Ready");
+        console.log("Requests:", requestsCollection);
+
+        window.submitOrderToFirebase = async (newRequest) => {
+            console.log("🔥 ADDING REQUEST");
+
+            const docRef = await addDoc(
+                requestsCollection,
+                newRequest
+            );
+
+            console.log("🔥 REQUEST ADDED:", docRef.id);
+
+            return docRef.id;
+        };
+
                 onSnapshot(projectsCollection, (snapshot) => {
                     const fetchedProjects = [];
                     snapshot.forEach(doc => { fetchedProjects.push({ ...doc.data(), id: doc.id }); });
@@ -616,7 +625,7 @@ window.submitOrderToFirebase = async (newRequest) => {
             }
             
             initFirebase();
-        }
+        
     </script>
 </body>
 </html>
