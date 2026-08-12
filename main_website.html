@@ -460,6 +460,7 @@
         window.closeOrderModal = () => document.getElementById('order-modal').classList.add('hidden');
     
 document.getElementById('client-order-form').addEventListener('submit', async (e) => {
+    console.log("SUBMIT HANDLER STARTED");
     e.preventDefault();
 
     const btn = document.getElementById('order-submit-btn');
