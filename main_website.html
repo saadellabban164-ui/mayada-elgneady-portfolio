@@ -578,14 +578,53 @@ document.getElementById('client-order-form').addEventListener('submit', async (e
         console.log("Firebase Ready");
         console.log("Requests:", requestsCollection);
 
-      window.submitOrderToFirebase = async (newRequest) => {
-    console.log("🔥 ADDING REQUEST", newRequest);
+     window.submitOrderToFirebase = async (newRequest) => {
+    console.log("🔥 REST FIRESTORE SEND");
 
-    const docRef = await addDoc(requestsCollection, newRequest);
+    const projectId = "mayada-protofolio";
 
-    console.log("🔥 REQUEST ADDED:", docRef.id);
+    const token = await auth.currentUser.getIdToken();
 
-    return docRef.id;
+    const url =
+        `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/requests`;
+
+    const fields = {};
+
+    Object.entries(newRequest).forEach(([key, value]) => {
+        if (typeof value === "boolean") {
+            fields[key] = { booleanValue: value };
+        } else if (typeof value === "number") {
+            fields[key] = { integerValue: String(value) };
+        } else {
+            fields[key] = { stringValue: String(value ?? "") };
+        }
+    });
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ fields })
+    });
+
+    const result = await response.json();
+
+    console.log("🔥 FIRESTORE REST RESPONSE:", result);
+
+    if (!response.ok) {
+        throw new Error(
+            result?.error?.message || "Firestore request failed"
+        );
+    }
+
+    const firebaseId =
+        result.name.split("/").pop();
+
+    console.log("🔥 REQUEST CREATED:", firebaseId);
+
+    return firebaseId;
 };
 
                 onSnapshot(projectsCollection, (snapshot) => {
