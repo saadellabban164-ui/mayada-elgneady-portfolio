@@ -577,24 +577,37 @@ async function initFirebase() {
     console.log("Firebase Ready");
     console.log("Requests:", requestsCollection);
 
-    window.submitOrderToFirebase = async (newRequest) => {
-        console.log("🔥 ADDING REQUEST TO FIRESTORE", newRequest);
+  window.submitOrderToFirebase = async (newRequest) => {
+    console.log("🔥 1 - FUNCTION START");
 
-        try {
-            const docRef = await addDoc(
-                requestsCollection,
-                newRequest
-            );
+    try {
+        console.log("🔥 2 - CURRENT USER:", auth.currentUser?.uid);
 
-            console.log("🔥 REQUEST CREATED:", docRef.id);
+        console.log("🔥 3 - BEFORE ADDDOC");
 
-            return docRef.id;
+        const docRef = await Promise.race([
+            addDoc(requestsCollection, newRequest),
 
-        } catch (error) {
-            console.error("🔥 FIRESTORE ADD ERROR:", error);
-            throw error;
-        }
-    };
+            new Promise((_, reject) =>
+                setTimeout(() => {
+                    reject(new Error("Firestore addDoc timed out after 10 seconds"));
+                }, 10000)
+            )
+        ]);
+
+        console.log("🔥 4 - REQUEST CREATED:", docRef.id);
+
+        return docRef.id;
+
+    } catch (error) {
+        console.error("🔥 5 - FIRESTORE ERROR");
+        console.error("Code:", error?.code);
+        console.error("Message:", error?.message);
+        console.error("Full error:", error);
+
+        throw error;
+    }
+};
 
     onSnapshot(
         projectsCollection,
