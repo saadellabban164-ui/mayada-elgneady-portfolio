@@ -583,39 +583,6 @@ async function initFirebase() {
 
     console.log("Firebase Ready");
     console.log("Requests:", requestsCollection);
-
-  window.submitOrderToFirebase = async (newRequest) => {
-    console.log("🔥 1 - FUNCTION START");
-
-    try {
-        console.log("🔥 2 - CURRENT USER:", auth.currentUser?.uid);
-
-        console.log("🔥 3 - BEFORE ADDDOC");
-
-        const docRef = await Promise.race([
-            addDoc(requestsCollection, newRequest),
-
-            new Promise((_, reject) =>
-                setTimeout(() => {
-                    reject(new Error("Firestore addDoc timed out after 10 seconds"));
-                }, 10000)
-            )
-        ]);
-
-        console.log("🔥 4 - REQUEST CREATED:", docRef.id);
-
-        return docRef.id;
-
-    } catch (error) {
-        console.error("🔥 5 - FIRESTORE ERROR");
-        console.error("Code:", error?.code);
-        console.error("Message:", error?.message);
-        console.error("Full error:", error);
-
-        throw error;
-    }
-};
-
     onSnapshot(
         projectsCollection,
         (snapshot) => {
